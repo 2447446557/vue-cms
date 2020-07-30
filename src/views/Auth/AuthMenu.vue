@@ -11,7 +11,7 @@
 				<span class="custom-tree-node" slot-scope="{ node, data }">
 					<span>{{ node.label }}</span>
 					<span>
-						<el-button type="text" :disabled="node.level==1" size="mini">
+						<el-button :icon="'el-icon-'+data.icon" @click.stop="openIconModel(node,data)" type="text" :disabled="node.level==1" size="mini">
 							图标
 						</el-button>
 						<el-button type="text" icon="el-icon-edit" :disabled="node.level==1" size="mini" @click.stop="() => openEditModal(node,data)">
@@ -20,7 +20,8 @@
 						<el-button type="text" icon="el-icon-plus" size="mini" @click.stop="() => openInsertModal(node,data)">
 							添加
 						</el-button>
-						<el-button @click.stop="() => deleteNode(node,data)" :disabled="node.level==1" type="text" icon="el-icon-delete" size="mini">
+						<el-button @click.stop="() => deleteNode(node,data)" :disabled="node.level==1" type="text" icon="el-icon-delete"
+						 size="mini">
 							删除
 						</el-button>
 						<span class="id">显示序号:{{ data.order }}</span>
@@ -72,6 +73,21 @@
 				<el-button type="primary" @click='handleUpdateNode'>保 存</el-button>
 			</div>
 		</el-dialog>
+		<!-- 图标框 -->
+		<el-dialog title="提示" :visible.sync="iconDialogVisible" width="70%">
+			<ul class="icon_list">
+				<li :class="{active : isChange === index}" @click="changeIcon(index,item.id,item.name)" v-for="(item,index) in iconAll">
+					<i style="font-size: 26px;" :class="'el-icon-'+item.name"></i>
+					{{item.name}}
+				</li>
+			</ul>
+			<el-pagination class="paging" @current-change="handleCurrentChange" layout="prev, pager, next" :total="100">
+			</el-pagination>
+			<span slot="footer" class="dialog-footer">
+				<el-button @click="iconDialogVisible = false">取 消</el-button>
+				<el-button type="primary" @click="iconSet">确 定</el-button>
+			</span>
+		</el-dialog>
 	</div>
 </template>
 
@@ -98,12 +114,17 @@
 				node: {}, //节点
 				insertModalShow: false,
 				editModalShow: false,
+				iconDialogVisible:false,
+				iconAll:[], //所有图标
+				icon:'',
+				iconName:'',
+				isChange:-1, //
 				rules: {
 					name: [{
 						required: true,
 						message: '请输入菜单名称',
 						trigger: 'blur'
-					},{
+					}, {
 						min: 4,
 						max: 12,
 						message: '长度在 4 到 12 个字符',
@@ -113,7 +134,7 @@
 						required: true,
 						message: '请输入显示顺序',
 						trigger: 'blur'
-					},{
+					}, {
 						min: 4,
 						max: 12,
 						message: '长度在 1 到 4 个字符',
@@ -138,6 +159,37 @@
 					return resolve(data);
 				}
 			},
+			// 打开图标框
+			openIconModel(node,data){
+				this.node = node;
+				this.iconIndex = node.data.id;
+				this.iconDialogVisible = true;
+				this.handleCurrentChange();
+			},
+			// 改变图标样式
+			changeIcon(index,id,name){
+				this.isChange = index;
+				this.icon = id;
+				this.iconName = name;
+			},
+			// 点击确定设置图标
+			async iconSet(){
+				let {status,msg} = await Role.icon_set({id:this.iconIndex,icon:this.icon});
+				if(status){
+					this.node.data.icon = this.iconName;
+					this.$message.success(msg);
+					this.iconDialogVisible = false;
+				}
+			},
+			// 分页器换页
+			async handleCurrentChange(val){
+				this.isChange = -1;
+				let { status, icons } = await Role.icon({ pageSize: 30, pageIndex: val });
+				if (status) {
+					this.iconAll = icons;
+				}
+			},
+			
 			// 编辑节点
 			async handleUpdateNode() {
 				// 1.表单验证
@@ -174,37 +226,37 @@
 					this.insertModalShow = false;
 				}
 			},
-			deleteNode(node, data){
+			deleteNode(node, data) {
 				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
 					confirmButtonText: '确定',
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(async () => {
-				let id = node.data.id;
-				let { status, msg } = await Role.del({ id });
-				if (status) {
-					this.$refs.tree.remove(node);
-					this.$message.success('删除成功');
-				}
-			}).catch(() => {
+					let id = node.data.id;
+					let { status, msg } = await Role.del({ id });
+					if (status) {
+						this.$refs.tree.remove(node);
+						this.$message.success('删除成功');
+					}
+				}).catch(() => {
 					// this.tableData.remove({ }) //...扩展运算符展开
 					this.$message.info('取消删除');
 				});
 			},
-			
-// 			async deleteNode(node, data) {
-// 				let id = node.data.id;
-// 				let { status, msg } = await Role.del({ id });
-// 				if (status) {
-// 					this.$refs.tree.remove(node);
-// 					this.$message.success('删除成功');
-// 				}
-// 			}
+
+			// 			async deleteNode(node, data) {
+			// 				let id = node.data.id;
+			// 				let { status, msg } = await Role.del({ id });
+			// 				if (status) {
+			// 					this.$refs.tree.remove(node);
+			// 					this.$message.success('删除成功');
+			// 				}
+			// 			}
 		}
 	};
 </script>
 
-<style>
+<style lang="less" scoped="scoped">
 	.custom-tree-node {
 		flex: 1;
 		display: flex;
@@ -217,6 +269,48 @@
 	.id {
 		font-size: 12px;
 		padding: 0 10px;
+	}
+	.icon_list{
+		list-style-type: none;
+		
+		.active{
+			color: white;
+			background-color: #5cb6ff;
+			// 关闭鼠标滑过事件
+			pointer-events: none;
+		}
+		
+		li{
+			width: 10%;
+			height: 100px;
+			float: left;
+			border: 1px solid #cfcfcf;
+			box-sizing: border-box;
+			padding: 20px 0;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			cursor: pointer;
+			
+			i{
+				margin-bottom: 10px;
+			}
+		}
+		
+		li:hover{
+			color: #5cb6ff;
+		}
+	}
+	.icon_list::after{
+	    content: "";/* 必须写，否则此伪元素创建不出来 */
+	    clear: both;
+	    height: 0;
+	    display: block;
+	}
+	.paging {
+		padding-top: 20px;
+		display: flex;
+		justify-content: flex-end;
 	}
 </style>
 subcate

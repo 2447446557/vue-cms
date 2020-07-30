@@ -16,6 +16,13 @@ let del = (id) => axios.delete('/api/category',{ params: id });
 let insert = (data) => axios.post('/api/menu', data);
 // 更新子菜单
 let update = (data) => axios.put('/api/menu',data);
+// 获取菜单
+let icon = (data) => axios.get('/api/admin/icon/list',{params:data});
+// 设置菜单图标
+let icon_set = (data) => axios.put('/api/menu/icon',data);
+// 拉去权限
+let rights = (data) => axios.get('/api/role/config',{params:data});
+
 export default {
 	list,
 	edit,
@@ -24,5 +31,8 @@ export default {
 	catesub,
 	del,
 	insert,
-	update
+	update,
+	icon,
+	icon_set,
+	rights
 }
