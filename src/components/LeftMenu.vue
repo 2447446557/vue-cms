@@ -1,67 +1,48 @@
 <template>
-	<el-menu class="el-menu-vertical-demo" router background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
-		<el-submenu index="1">
-			<template slot="title">
-				<i class="el-icon-s-goods"></i>
-				<span>商品管理</span>
-			</template>
-			<el-menu-item-group>
-				<el-menu-item index='/goods/goodscategory'>商品分类</el-menu-item>
-				<el-menu-item index='/goods/goodsrelease'>发布商品</el-menu-item>
-				<el-menu-item index='/goods/goodslist'>商品列表</el-menu-item>
-			</el-menu-item-group>
-		</el-submenu>
-		<el-submenu index="2">
-			<template slot="title">
-				<i class="el-icon-files"></i>
-				<span>订单管理</span>
-			</template>
-			<el-menu-item-group>
-				<el-menu-item index='/order/orderlist'>订单列表</el-menu-item>
-			</el-menu-item-group>
-		</el-submenu>
-		<el-submenu index="3">
-			<template slot="title">
-				<i class="el-icon-setting"></i>
-				<span>账户设置</span>
-			</template>
-			<el-menu-item-group>
-				<el-menu-item index='/user/userinfo'>账户信息</el-menu-item>
-			</el-menu-item-group>
-		</el-submenu>
-		<el-submenu index="4">
-			<template slot="title">
-				<i class="el-icon-user"></i>
-				<span>用户管理</span>
-			</template>
-			<el-menu-item-group>
-				<el-menu-item index='/user/userlist'>用户列表</el-menu-item>
-			</el-menu-item-group>
-		</el-submenu> 
-		<el-submenu index="5">
-			<template slot="title">
-				<i class="el-icon-set-up"></i>
-				<span>权限设置</span>
-			</template>
-			<el-menu-item-group>
-				<el-menu-item index='/auth/authrole'>用户角色</el-menu-item>
-				<el-menu-item index='/auth/authmenu'>菜单权限</el-menu-item>
-			</el-menu-item-group>
-		</el-submenu>
-	</el-menu>
-	</el-col>
-	</el-row>
+    <el-menu router background-color="#334e66" text-color="#fff" active-text-color="#ffd04b"
+        class="left-menu">
+        <el-submenu v-for="(item,index) in menuData" :key="item.id" :index="index+''">
+            <template slot="title">
+                <i :class="'el-icon-' + item.icon"></i>
+                <span>{{item.name}}</span>
+            </template>
+            <el-menu-item v-for="(item) in item.children" :key="item.id" :index="item.path">{{item.name}}
+            </el-menu-item>
+        </el-submenu>
+    </el-menu>
 </template>
 
 <script>
-	export default {
-		methods: {
-		}
-	}
-</script>
+import { Role } from '@/api/index';
+export default {
+    created() {
+        this.loadMenu();
+    },
+    data() {
+        return {
+            menuData: [],
+        }
+    },
+    methods: {
+        async loadMenu() {
+            var id = sessionStorage.role;
+            let { status, data } = await Role.loadMenu({ id });
+            if (status) {
+				console.log(data);
+                this.menuData = data;
+            }
+        }
+    },
 
-<style>
-	.el-menu-vertical-demo {
-		
-	}
+};
+</script>
+<style lang="less" scope>
+.left-menu {
+    color: white;
+    height: calc(100vh - 60px);
+
+    .el-menu-item {
+        text-align: center;
+    }
+}
 </style>

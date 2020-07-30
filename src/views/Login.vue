@@ -82,7 +82,7 @@
 								this.$router.replace(redirect);
 							} else {
 								// 默认跳转路由
-								this.$router.replace('/Goods/GoodsList');
+								this.$router.replace('/goods/list');
 							}
 						} else {
 							// 失败

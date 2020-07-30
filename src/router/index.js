@@ -20,22 +20,22 @@ const routes = [{
 		component: Layout,
 		meta: { requiresAuth: true },
 		children: [{
-				path: 'goodscategory',
+				path: 'category',
 				name: 'GoodsCategory',
 				component: () => import('@/views/Goods/GoodsCategory.vue'),
 			},
 			{
-				path: 'goodsrelease',
+				path: 'release',
 				name: 'GoodsRelease',
 				component: () => import('@/views/Goods/GoodsRelease.vue'),
 			},
 			{
-				path: 'goodslist',
+				path: 'list',
 				name: 'GoodsList',
 				component: () => import('@/views/Goods/GoodsList.vue'),
 			},
 			{
-				path: 'goodsedit/:id',
+				path: 'edit/:id',
 				name: 'GoodsEdit',
 				component: () => import('@/views/Goods/GoodsEdit.vue'),
 				props:true
@@ -48,12 +48,12 @@ const routes = [{
 		component: Layout,
 		meta: { requiresAuth: true },
 		children: [{
-				path: 'userinfo',
+				path: 'info',
 				name: 'UserInfo',
 				component: () => import('@/views/User/UserInfo.vue')
 			},
 			{
-				path: 'userlist',
+				path: 'list',
 				name: 'UserList',
 				component: () => import('@/views/User/UserList.vue')
 			}
@@ -65,7 +65,7 @@ const routes = [{
 		component: Layout,
 		meta: { requiresAuth: true },
 		children: [{
-			path: 'orderlist',
+			path: 'list',
 			name: 'OrderList',
 			component: () => import('@/views/Order/OrderList.vue')
 		}]
@@ -76,12 +76,12 @@ const routes = [{
 		component: Layout,
 		meta: { requiresAuth: true },
 		children: [{
-				path: 'authrole',
+				path: 'role',
 				name: 'AuthRole',
 				component: () => import('@/views/Auth/AuthRole.vue')
 			},
 			{
-				path: 'authmenu',
+				path: 'menu',
 				name: 'AuthMenu',
 				component: () => import('@/views/Auth/AuthMenu.vue')
 			}

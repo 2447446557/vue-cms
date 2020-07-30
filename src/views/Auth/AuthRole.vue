@@ -83,6 +83,37 @@
 					this.rightsId = id;
 				}
 			},
+			async clickParent({ id, checked, children }) {
+				if (checked) {
+					let { status } = await Role.add_rights({ role_id: this.rightsId, menu_id: id });
+					children.forEach(async (item) => {
+						let { status } = await Role.add_rights({ role_id: this.rightsId, menu_id: item.id });
+						item.checked = checked;
+					})
+				} else {
+					let { status } = await Role.del_rights({ role_id: this.rightsId, menu_id: id });
+					children.forEach(async (item) => {
+						let { status } = await Role.del_rights({ role_id: this.rightsId, menu_id: item.id });
+						item.checked = checked;
+					})
+				}
+			},
+			async clickChild({ checked, id }, parent) {
+			    if (checked) {
+			        let { status } = await Role.add_rights({ role_id: this.rightsId, menu_id: id });
+			        if (!parent.checked) {
+			            let { status } = await Role.add_rights({ role_id: this.rightsId, menu_id: parent.id });
+			            parent.checked = checked;
+			        }
+			    } else {
+			        let { status } = await Role.del_rights({ role_id: this.rightsId, menu_id: id });
+			        var isclick = parent.children.every((item) => item.checked == false);
+			        if (isclick) {
+			            let { status } = await Role.del_rights({ role_id: this.rightsId, menu_id: parent.id });
+			            parent.checked = checked;
+			        }
+			    }
+			},
 			async loadList() {
 				let { status, total, data } = await Role.list({ pagesizeL: 10, pageindex: 1 });
 				if (status) {

@@ -29,5 +29,7 @@
 </script>
 
 <style>
-	
+	.el-aside {
+		height: 100%;
+	}
 </style>

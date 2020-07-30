@@ -22,6 +22,12 @@ let icon = (data) => axios.get('/api/admin/icon/list',{params:data});
 let icon_set = (data) => axios.put('/api/menu/icon',data);
 // 拉去权限
 let rights = (data) => axios.get('/api/role/config',{params:data});
+// 增加权限
+let add_rights = (data) => axios.post('/api/role/menu',data);
+// 删除权限
+let del_rights = (data) => axios.delete('/api/role/menu',{params:data});
+// 获取权限菜单
+let loadMenu = (data) => axios.get('/api/menu/tree',{params:data});
 
 export default {
 	list,
@@ -34,5 +40,8 @@ export default {
 	update,
 	icon,
 	icon_set,
-	rights
+	rights,
+	add_rights,
+	del_rights,
+	loadMenu
 }
